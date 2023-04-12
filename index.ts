@@ -13,32 +13,40 @@ interface Options {
 }
 
 class Client {
-  source: string;
-  target: string;
-  logger: Pick<Console, Severity>;
-  events!: EventSource;
+  source: string
+  target: string
+  logger: Pick<Console, Severity>
+  events!: EventSource
 
   constructor ({ source, target, logger = console }: Options) {
     this.source = source
     this.target = target
-    this.logger = logger!
+    this.logger = logger
 
     if (!validator.isURL(this.source)) {
-      throw new Error('The provided URL is invalid.')
+      throw new Error('The provided source URL is invalid.')
+    }
+
+    if (!validator.isURL(this.target)) {
+      throw new Error('The provided target URL is invalid.')
+    }
+
+    if (this.logger === undefined) {
+      throw new Error('A logger must be provided.')
     }
   }
 
-  static async createChannel () {
-    return superagent.head('https://smee.io/new').redirects(0).catch((err) => {
+  static async createChannel (): Promise<string> {
+    return await superagent.head('https://smee.io/new').redirects(0).catch((err) => {
       return err.response.headers.location
     })
   }
 
-  onmessage (msg: any) {
+  onmessage (msg: any): void {
     const data = JSON.parse(msg.data)
 
-    const target = url.parse(this.target, true)
-    const mergedQuery = Object.assign(target.query, data.query)
+    const target = new url.URL(this.target)
+    const mergedQuery = Object.assign(target, data.query)
     target.search = querystring.stringify(mergedQuery)
 
     delete data.query
@@ -51,11 +59,11 @@ class Client {
     delete data.body
 
     Object.keys(data).forEach(key => {
-      req.set(key, data[key])
+      void req.set(key, data[key])
     })
 
     req.end((err, res) => {
-      if (err) {
+      if (typeof err === 'string' && err.length !== 0) {
         this.logger.error(err)
       } else {
         this.logger.info(`${req.method} ${req.url} - ${res.status}`)
@@ -63,15 +71,15 @@ class Client {
     })
   }
 
-  onopen () {
+  onopen (): void {
     this.logger.info('Connected', this.events.url)
   }
 
-  onerror (err: any) {
+  onerror (err: any): void {
     this.logger.error(err)
   }
 
-  start () {
+  start (): EventSource {
     const events = new EventSource(this.source);
 
     // Reconnect immediately

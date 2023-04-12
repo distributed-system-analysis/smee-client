@@ -1,6 +1,6 @@
 <h2 align="center">smee-client</h2>
 <p align="center">Client and CLI for smee.io, a service that delivers webhooks to your local development environment.</p>
-<p align="center"><a href="https://npmjs.com/package/smee-client"><img src="https://img.shields.io/npm/v/smee-client/latest.svg" alt="NPM"></a> <a href="https://travis-ci.com/probot/smee-client"><img src="https://badgen.now.sh/travis/probot/smee-client" alt="Build Status"></a> <a href="https://codecov.io/gh/probot/smee-client/"><img src="https://badgen.now.sh/codecov/c/github/probot/smee-client" alt="Codecov"></a></p>
+<p align="center"><img src="https://github.com/distributed-system-analysis/smee-client/actions/workflows/test.yml/badge.svg" alt="Build Status"> <a href="https://codecov.io/gh/distributed-system-analysis/smee-client"><img src="https://badgen.net/codecov/c/github/distributed-system-analysis/smee-client" alt="Codecov"></a></p>
 
 <p align="center"><a href="https://github.com/probot/smee.io">Looking for <strong>probot/smee.io</strong>?</a></p>
 
