@@ -6,7 +6,7 @@ logs.json
 server/public/main.min.*
 coverage
 .vscode
-index.js
-test/index.test.js
+client.js
+client.test.js
 *.d.ts
 *.tsbuildinfo

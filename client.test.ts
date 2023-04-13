@@ -1,4 +1,4 @@
-import Client = require('..')
+import Client = require('.')
 import nock = require('nock')
 
 describe('client', () => {
