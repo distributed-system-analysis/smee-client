@@ -2,8 +2,7 @@
 
 const program = require('commander')
 const { version } = require('../package.json')
-
-const Client = require('..')
+const Client = require('../client.js')
 
 program
   .version(version, '-v, --version')
