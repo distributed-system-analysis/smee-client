@@ -24,11 +24,11 @@ class Client {
     this.logger = logger
 
     if (!validator.isURL(this.source)) {
-      throw new Error('The provided source URL is invalid.')
+      throw new Error(`The provided source URL, '${this.source}', is invalid.`)
     }
 
     if (!validator.isURL(this.target)) {
-      throw new Error('The provided target URL is invalid.')
+      throw new Error(`The provided target URL, '${this.target}', is invalid.`)
     }
 
     if (this.logger === undefined) {
