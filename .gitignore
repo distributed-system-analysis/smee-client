@@ -1,4 +1,5 @@
 node_modules
+dist
 npm-debug.log
 *.pem
 .env
@@ -6,7 +7,6 @@ logs.json
 server/public/main.min.*
 coverage
 .vscode
-client.js
-client.test.js
 *.d.ts
 *.tsbuildinfo
+src/version.ts
