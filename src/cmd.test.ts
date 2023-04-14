@@ -1,19 +1,16 @@
 import cmd = require('./cmd')
 
 describe('commander', (): void => {
-  const writeSpy = jest.spyOn(process.stdout, 'write').mockImplementation((): boolean => { return false })
+  const writeSpy = jest.spyOn(process.stdout, 'write').mockImplementation((): boolean => false)
 
   afterEach(() => {
     writeSpy.mockClear()
   })
 
   test('when -h or --help given', () => {
-    expect(() => {
-      cmd.parseCommandLine(['node', 'smee', '--help'])
-    }).toThrow('(outputHelp)')
-    expect(() => {
-      cmd.parseCommandLine(['node', 'smee', '-h'])
-    }).toThrow('(outputHelp)')
+    const doIt = (s: string) => () => cmd.parseCommandLine(['node', 'smee', s])
+    expect(doIt('--help')).toThrow('(outputHelp)')
+    expect(doIt('-h')).toThrow('(outputHelp)')
   })
 
   test('when only -p or --port given', () => {
