@@ -68,7 +68,7 @@ class Client {
   }
 
   onopen (): void {
-    this.logger.info('Connected', this.events.url)
+    this.logger.info('Connected', this.source)
   }
 
   onerror (err: any): void {
@@ -76,7 +76,14 @@ class Client {
   }
 
   start (): EventSource {
-    const events = new EventSource(this.source);
+    const events = new EventSource(this.source)
+
+    if (events.url !== this.source) {
+      this.logger.error(
+        `The event source object is using the wrong URL: using ${events.url}, expected ${this.source}`
+      )
+      process.exit(1)
+    }
 
     // Reconnect immediately
     (events as any).reconnectInterval = 0 // This isn't a valid property of EventSource

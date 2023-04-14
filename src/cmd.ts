@@ -9,7 +9,7 @@ export function parseCommandLine (argv: string[]): { source: string, target: str
     .version(VERSION, '-v, --version')
     .usage('[options]')
     .option('-u, --url <url>', 'URL of the webhook proxy service. Default: https://smee.io/new')
-    .option('-t, --target <target>', 'Full URL (including protocol and path) of the target service the events will forwarded to. Default: http://127.0.0.1:PORT/PATH')
+    .option('-t, --target <target>', 'Full URL (including protocol and path) of the target service to which the events will forwarded; --port and --path ignored when specified. Default: http://127.0.0.1:3000/')
     .option('-p, --port <n>', 'Local HTTP server port', process.env.PORT ?? '3000')
     .option('-P, --path <path>', 'URL path to post proxied requests to`', '/')
     .parse(argv)

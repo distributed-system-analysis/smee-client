@@ -6,8 +6,4 @@ const fs = require('fs');
 const version = require('../package.json').version;
 const contents = `export const VERSION = '${version}'\n`;
 
-fs.writeFile('src/version.ts', contents,
-    function(err) {
-        if (err) throw err;
-    }
-);
+fs.writeFile('src/version.ts', contents, (err) => { if (err) throw err; });
