@@ -30,10 +30,6 @@ class Client {
     if (!validator.isURL(this.target)) {
       throw new Error(`The provided target URL, '${this.target}', is invalid.`)
     }
-
-    if (this.logger === undefined) {
-      throw new Error('A logger must be provided.')
-    }
   }
 
   static async createChannel (): Promise<string> {

@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+
+// Create a src/version.ts file with the version value from package.json.
+const version = require('../package.json').version;
+const contents = `export const VERSION = '${version}'\n`;
+
+fs.writeFile('src/version.ts', contents,
+    function(err) {
+        if (err) throw err;
+    }
+);
