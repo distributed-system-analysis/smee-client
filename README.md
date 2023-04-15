@@ -19,7 +19,7 @@ $ npm install -g smee-client
 The `smee` command will forward webhooks from smee.io to your local development environment.
 
 ```
-$ smee
+$ smee me
 ```
 
 Run `smee --help` for usage.
