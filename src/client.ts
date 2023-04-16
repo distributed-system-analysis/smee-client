@@ -1,6 +1,6 @@
 import validator from 'validator'
 import EventSource from 'eventsource'
-import superagent from 'superagent'
+import request from 'superagent'
 import url from 'url'
 import querystring from 'querystring'
 
@@ -33,7 +33,7 @@ class Client {
   }
 
   static async createChannel (): Promise<string> {
-    return await superagent.head('https://smee.io/new').redirects(0).catch((err) => {
+    return await request.head('https://smee.io/new').redirects(0).catch((err) => {
       return err.response.headers.location
     })
   }
@@ -41,30 +41,35 @@ class Client {
   onmessage (msg: any): void {
     const data = JSON.parse(msg.data)
 
+    // Construct the new target URL merged query parameters.
     const target = new url.URL(this.target)
     const mergedQuery = Object.assign(target, data.query)
     target.search = querystring.stringify(mergedQuery)
-
     delete data.query
 
-    // Remove the host header, leaving it causes issues with SNI and TLS verification
+    // Remove the host header, leaving it causes issues with SNI and TLS
+    // verification.
     delete data.host
 
-    const req = superagent.post(url.format(target)).send(data.body)
-
+    // Remove the body from the data object so it won't get copied among all the
+    // other keys.
+    const body = data.body
     delete data.body
+
+    const req = request.post(url.format(target))
+    this.logger.info(`Initiating ${req.method} ${req.url}`)
 
     Object.keys(data).forEach(key => {
       void req.set(key, data[key])
     })
 
-    req.end((err, res) => {
-      if (typeof err === 'string' && err.length !== 0) {
-        this.logger.error(err)
-      } else {
-        this.logger.info(`${req.method} ${req.url} - ${res.status}`)
-      }
-    })
+    req.send(body)
+      .then((res) => {
+        this.logger.info(`SUCCESS: ${req.method} ${req.url} - ${res.status}`)
+      })
+      .catch((err) => {
+        this.logger.error(`ERROR: ${req.method} ${req.url}`, err)
+      })
   }
 
   onopen (): void {
@@ -72,7 +77,7 @@ class Client {
   }
 
   onerror (err: any): void {
-    this.logger.error(err)
+    this.logger.error(`Failed to connect to ${this.source}`, err)
   }
 
   start (): EventSource {
