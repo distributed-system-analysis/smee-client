@@ -6,7 +6,7 @@
 
 ## Installation
 
-Install the client with:
+HUH Install the client with:
 
 ```
 $ npm install -g smee-client
