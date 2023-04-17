@@ -39,9 +39,21 @@ class Client {
   }
 
   onmessage (msg: any): void {
+    // Capture the current time stamp before doing anything else
+    let ts = new Date()
+
     const data = JSON.parse(msg.data)
 
-    // Construct the new target URL merged query parameters.
+    // To help understand the behavior of the client, we pull out the various
+    // GitHub headers to provide the same information displayed on the GitHub
+    // Webhooks page for a configured web-hook.
+    const delivery: string = data['x-github-delivery']
+    const event: string = data['x-github-event']
+    const payload = JSON.parse(data.body.payload)
+    const action: string = payload.action
+    this.logger.info(ts, `${delivery} ${event}.${action} -- Received`)
+
+    // Construct the new target URL with merged query parameters.
     const target = new url.URL(this.target)
     const mergedQuery = Object.assign(target, data.query)
     target.search = querystring.stringify(mergedQuery)
@@ -52,12 +64,15 @@ class Client {
     delete data.host
 
     // Remove the body from the data object so it won't get copied among all the
-    // other keys.
+    // other keys below.
     const body = data.body
     delete data.body
 
     const req = request.post(url.format(target))
-    this.logger.info(`Initiating ${req.method} ${req.url}`)
+    ts = new Date()
+    this.logger.info(
+      ts, `${delivery} ${event}.${action} -- Forwarding ${req.method} ${req.url}`
+    )
 
     Object.keys(data).forEach(key => {
       void req.set(key, data[key])
@@ -65,10 +80,12 @@ class Client {
 
     req.send(body)
       .then((res) => {
-        this.logger.info(`SUCCESS: ${req.method} ${req.url} - ${res.status}`)
+        ts = new Date()
+        this.logger.info(ts, `${delivery} ${event}.${action} -- SUCCESS: ${req.method} ${req.url} - ${res.status}`)
       })
       .catch((err) => {
-        this.logger.error(`ERROR: ${req.method} ${req.url}`, err)
+        ts = new Date()
+        this.logger.error(ts, `${delivery} ${event}.${action} -- ERROR: ${req.method} ${req.url}`, err)
       })
   }
 
