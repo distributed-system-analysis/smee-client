@@ -42,15 +42,38 @@ class Client {
     // Capture the current time stamp before doing anything else
     let ts = new Date()
 
-    const data = JSON.parse(msg.data)
+    let data: any
+    try {
+      data = JSON.parse(msg.data)
+    } catch (err) {
+      this.logger.error(ts, 'ERROR: bad msg', err, msg)
+      return
+    }
+
+    // Remove the body from the data object so it won't get copied among all the
+    // other keys below.
+    const body = data.body
+    delete data.body
 
     // To help understand the behavior of the client, we pull out the various
     // GitHub headers to provide the same information displayed on the GitHub
     // Webhooks page for a configured web-hook.
     const delivery: string = data['x-github-delivery']
     const event: string = data['x-github-event']
-    const payload = JSON.parse(data.body.payload)
-    const action: string = payload.action
+    let action: string
+
+    if (body.action === undefined) {
+      let payload: any
+      try {
+        payload = JSON.parse(body.payload)
+      } catch (err) {
+        this.logger.error(ts, 'ERROR: bad payload', err, 'body: ', body)
+        return
+      }
+      action = payload.action
+    } else {
+      action = body.action
+    }
     this.logger.info(ts, `${delivery} ${event}.${action} -- Received`)
 
     // Construct the new target URL with merged query parameters.
@@ -62,11 +85,6 @@ class Client {
     // Remove the host header, leaving it causes issues with SNI and TLS
     // verification.
     delete data.host
-
-    // Remove the body from the data object so it won't get copied among all the
-    // other keys below.
-    const body = data.body
-    delete data.body
 
     const req = request.post(url.format(target))
     ts = new Date()
