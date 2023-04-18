@@ -2,7 +2,7 @@
 #   $ buildah bud -t smee-client:latest -f containers/Dockerfile
 
 # First create a base stage with NodeJS installed.
-FROM registry.fedoraproject.org/fedora-minimal:37 AS smee-client-base
+FROM registry.fedoraproject.org/fedora-minimal:39 AS smee-client-base
 USER root
 RUN microdnf update -y && microdnf install -y nodejs && rm -r /var/cache/yum
 
