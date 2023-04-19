@@ -4,7 +4,7 @@ import request from 'superagent'
 import url from 'url'
 import querystring from 'querystring'
 
-type Severity = 'info' | 'error'
+type Severity = 'info' | 'warn' | 'error'
 
 interface Options {
   source: string
@@ -60,21 +60,27 @@ class Client {
     // Webhooks page for a configured web-hook.
     const delivery: string = data['x-github-delivery']
     const event: string = data['x-github-event']
-    let action: string
 
-    if (body.action === undefined) {
+    let action: string = ''
+    if (body.action !== undefined) {
+      action = body.action
+    } else if (body.payload !== undefined) {
       let payload: any
       try {
         payload = JSON.parse(body.payload)
+        action = payload.action
       } catch (err) {
-        this.logger.error(ts, 'ERROR: bad payload', err, 'body: ', body)
-        return
+        this.logger.warn(ts, 'ERROR: bad payload', err, 'msg: ', msg)
       }
-      action = payload.action
-    } else {
-      action = body.action
     }
-    this.logger.info(ts, `${delivery} ${event}.${action} -- Received`)
+    let finalEvent: string
+    if (action.length > 0) {
+      finalEvent = `${event}.${action}`
+    } else {
+      finalEvent = event
+    }
+    const prefix: string = `${delivery} ${finalEvent}`
+    this.logger.info(ts, `${prefix} -- Received`)
 
     // Construct the new target URL with merged query parameters.
     const target = new url.URL(this.target)
@@ -89,7 +95,7 @@ class Client {
     const req = request.post(url.format(target))
     ts = new Date()
     this.logger.info(
-      ts, `${delivery} ${event}.${action} -- Forwarding ${req.method} ${req.url}`
+      ts, `${prefix} -- Forwarding ${req.method} ${req.url}`
     )
 
     Object.keys(data).forEach(key => {
@@ -99,11 +105,11 @@ class Client {
     req.send(body)
       .then((res) => {
         ts = new Date()
-        this.logger.info(ts, `${delivery} ${event}.${action} -- SUCCESS: ${req.method} ${req.url} - ${res.status}`)
+        this.logger.info(ts, `${prefix} -- SUCCESS: ${req.method} ${req.url} - ${res.status}`)
       })
       .catch((err) => {
         ts = new Date()
-        this.logger.error(ts, `${delivery} ${event}.${action} -- ERROR: ${req.method} ${req.url}`, err)
+        this.logger.error(ts, `${prefix} -- ERROR: ${req.method} ${req.url}`, err)
       })
   }
 
