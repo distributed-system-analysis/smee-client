@@ -1,3 +1,4 @@
+<h1 align="center">ARCHIVED - See https://github.com/chmouel/gosmee<h1>
 <h2 align="center">smee-client</h2>
 <p align="center">Client and CLI for smee.io, a service that delivers webhooks to your local development environment.</p>
 <p align="center"><img src="https://github.com/distributed-system-analysis/smee-client/actions/workflows/ci.yml/badge.svg" alt="Build Status"> <a href="https://codecov.io/gh/distributed-system-analysis/smee-client"><img src="https://badgen.net/codecov/c/github/distributed-system-analysis/smee-client" alt="Codecov"></a></p>
