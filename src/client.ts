@@ -65,20 +65,13 @@ class Client {
     if (body.action !== undefined) {
       action = body.action
     } else if (body.payload !== undefined) {
-      let payload: any
       try {
-        payload = JSON.parse(body.payload)
-        action = payload.action
+        action = JSON.parse(body.payload).action
       } catch (err) {
         this.logger.warn(ts, 'ERROR: bad payload', err, 'msg: ', msg)
       }
     }
-    let finalEvent: string
-    if (action.length > 0) {
-      finalEvent = `${event}.${action}`
-    } else {
-      finalEvent = event
-    }
+    const finalEvent: string = action.length > 0 ? `${event}.${action}` : event
     const prefix: string = `${delivery} ${finalEvent}`
     this.logger.info(ts, `${prefix} -- Received`)
 
